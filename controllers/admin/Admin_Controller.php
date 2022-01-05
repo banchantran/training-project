@@ -41,24 +41,27 @@ class AdminController extends BaseController
     public function create()
     {
         if (isset($_POST['submit'])) {
-            $fields = "id";
-            $data = $this->model->getByEmail($_POST['email'], $fields);
-            $this->validated->validateCreate($_POST, $data, $_FILES["avatar"]);
+            $checkDataExist = $this->model->getByEmail($_POST['email']);
+            
+            $data = array_merge($_POST, $checkDataExist, $_FILES);
+            $validated = $this->validated->validateCreate($data);
+            
             $_SESSION['dl'] = $_POST;
 
-            if (!isset($_SESSION['errCreate'])) {
+            if ($validated['status'] == true) {
                 $avatar = "";
-                $password = md5($_POST['password']);
                 if ($_FILES["avatar"]["name"] != "") {
                     $avatar = time() . "_" . $_FILES["avatar"]["name"];
                 }
+                
                 $arrInsert = array(
                     "name" => $_POST['name'],
                     "email" => $_POST['email'],
-                    "password" => $password,
+                    "password" => md5($_POST['password']),
                     "role" => $_POST['role'],
                     "avatar" => $avatar
                 );
+                
                 $conn = $this->model->create($arrInsert);
                 $id = $conn->lastInsertId();
 
@@ -68,8 +71,9 @@ class AdminController extends BaseController
 
                 $_SESSION['success'] = CREATE_SUCCESSFUL;
                 unset($_SESSION['dl']);
-                header("location:search");
+                $this->redirect('search');
             } else {
+                $_SESSION['validate'] = ...
                 header("location:create");
             }
         } else {

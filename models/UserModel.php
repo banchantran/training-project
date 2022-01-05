@@ -10,9 +10,18 @@ class UserModel extends BaseModel
         $this->tabelName = 'users';
     }
 
-    public function list($sqlSearch, $sqlOrder)
+    public function list(" where name ..... ", " order by id desc")
     {
-        $sql = "select * from $this->tabelName where del_flag =" . ACTIVED . " $sqlSearch $sqlOrder";
+        $where = "";
+        if (isset($conditions['name']) {
+              $where .= " name like %$conditions['name']%";
+        }
+            
+        if (isset($conditions['email']) {
+              $where .= " name like %$conditions['email']%";
+        }
+        
+        $sql = "select * from $this->tabelName where del_flag =" . ACTIVED . " $where . $orderBy";
         $query = $this->conn->query($sql);
         return $query->fetchAll();
     }
